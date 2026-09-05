@@ -1,0 +1,43 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Registro fotográfico</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  <form #formulario="ngForm" class="registro-form" (ngSubmit)="guardarRegistro()">
+    <h1>Fotografía del clima actual</h1>
+    <p class="intro">Captura una imagen y añade los detalles del momento.</p>
+    <input #selectorFotografia class="selector-fotografia" type="file" accept="image/*" capture="environment" (change)="seleccionarFotografia($event)" />
+    <ion-button type="button" expand="block" (click)="selectorFotografia.click()">Tomar fotografía</ion-button>
+    <div class="vista-previa" *ngIf="fotografia">
+      <img [src]="fotografia" alt="Fotografía del clima actual" />
+    </div>
+    <ion-item [class.ion-invalid]="condicionControl.invalid && condicionControl.touched">
+      <ion-label position="stacked">Condiciones climáticas</ion-label>
+      <ion-select #condicionControl="ngModel" name="condicion" [(ngModel)]="condicion" placeholder="Selecciona una condición" required>
+        <ion-select-option value="Soleado">Soleado</ion-select-option>
+        <ion-select-option value="Nublado">Nublado</ion-select-option>
+        <ion-select-option value="Lluvioso">Lluvioso</ion-select-option>
+      </ion-select>
+    </ion-item>
+    <ion-note color="danger" *ngIf="condicionControl.invalid && condicionControl.touched">Selecciona una condición climática.</ion-note>
+    <ion-item>
+      <ion-label position="stacked">Comentario</ion-label>
+      <ion-textarea name="comentario" [(ngModel)]="comentario" placeholder="Escribe un comentario sobre la fotografía" [autoGrow]="true"></ion-textarea>
+    </ion-item>
+    <ion-button expand="block" color="success" type="submit" [disabled]="formulario.invalid || !fotografia">Registrar fotografía</ion-button>
+  </form>
+  <ion-card *ngIf="registro" class="registro-guardado">
+    <ion-card-header><ion-card-title>Registro actual</ion-card-title></ion-card-header>
+    <ion-card-content>
+      <img [src]="registro.fotografia" alt="Fotografía registrada" />
+      <p><strong>Condición:</strong> {{ registro.condicion }}</p>
+      <p *ngIf="registro.comentario"><strong>Comentario:</strong> {{ registro.comentario }}</p>
+      <p class="fecha">{{ registro.fecha }}</p>
+    </ion-card-content>
+  </ion-card>
+</ion-content>

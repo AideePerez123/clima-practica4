@@ -1,0 +1,17 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Inicio</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%;">
+    <h1 style="font-size: 2rem; font-weight: bold; margin-bottom: 30px;">UMES -MOVIL 2</h1>
+    <ion-button expand="block" color="primary" (click)="irAClima()">
+      Consultar clima
+    </ion-button>
+    <ion-button expand="block" color="secondary" (click)="irARegistro()">
+      Registrar fotografía del clima
+    </ion-button>
+  </div>
+</ion-content>

@@ -1,0 +1,20 @@
+:host {
+  --accent: #147d92;
+  --ink: #173042;
+  --paper: #f4f8f7;
+}
+
+ion-content { --background: var(--paper); }
+.registro-form, .registro-guardado { max-width: 680px; margin-left: auto; margin-right: auto; }
+h1 { color: var(--ink); font-size: 1.7rem; margin: 0.5rem 0 0.35rem; }
+.intro { color: #52666e; margin: 0 0 1.4rem; }
+.selector-fotografia { display: none; }
+ion-item { --background: transparent; --padding-start: 0; margin-top: 0.9rem; }
+ion-button { margin: 1rem 0; }
+.vista-previa, .registro-guardado { overflow: hidden; }
+.vista-previa { aspect-ratio: 4 / 3; background: #dce9e7; border-radius: 8px; margin-top: 1rem; }
+.vista-previa img, .registro-guardado img { width: 100%; height: 100%; display: block; object-fit: cover; }
+.registro-guardado { margin-top: 1.5rem; }
+.registro-guardado img { aspect-ratio: 4 / 3; border-radius: 6px; }
+.registro-guardado p { color: var(--ink); margin: 0.75rem 0 0; }
+.registro-guardado .fecha { color: #64777d; font-size: 0.85rem; }

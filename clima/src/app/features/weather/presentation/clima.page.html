@@ -1,0 +1,39 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Consultar Clima</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/"></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  <ion-item>
+    <ion-label position="stacked">Selecciona un país</ion-label>
+    <ion-select [(ngModel)]="paisSeleccionado" interface="popover" placeholder="Elige un país">
+      <ion-select-option *ngFor="let p of paises" [value]="p">{{ p.nombre }}</ion-select-option>
+    </ion-select>
+  </ion-item>
+  <ion-button expand="block" color="success" (click)="consultarClima()" [disabled]="cargando">
+    Consultar clima
+  </ion-button>
+  <div *ngIf="cargando" style="display: flex; justify-content: center; margin: 20px 0;">
+    <ion-spinner name="crescent" color="primary"></ion-spinner>
+    <p style="margin-left: 10px;">Cargando clima...</p>
+  </div>
+  <ion-card *ngIf="clima" style="margin-top: 20px; background: #f0f8ff;">
+    <ion-card-header><ion-card-title>Resultados</ion-card-title></ion-card-header>
+    <ion-card-content>
+      <ion-list>
+        <ion-item><ion-label><b>País:</b> {{ clima.pais }}</ion-label></ion-item>
+        <ion-item><ion-label><b>Capital:</b> {{ clima.capital }}</ion-label></ion-item>
+        <ion-item><ion-label><b>Condición:</b> {{ clima.condicion }}</ion-label></ion-item>
+        <ion-item><ion-label><b>Temperatura:</b> {{ clima.temperatura }} °C</ion-label></ion-item>
+        <ion-item><ion-label><b>Sensación térmica:</b> {{ clima.sensacion_termica }} °C</ion-label></ion-item>
+        <ion-item><ion-label><b>Humedad:</b> {{ clima.humedad }} %</ion-label></ion-item>
+        <ion-item><ion-label><b>Viento:</b> {{ clima.viento }} km/h</ion-label></ion-item>
+        <ion-item><ion-label><b>Fecha/Hora:</b> {{ clima.fecha_hora }}</ion-label></ion-item>
+      </ion-list>
+    </ion-card-content>
+  </ion-card>
+</ion-content>

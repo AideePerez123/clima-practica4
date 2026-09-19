@@ -1,43 +1,51 @@
 <ion-header [translucent]="true">
-  <ion-toolbar>
+  <ion-toolbar color="primary">
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/home"></ion-back-button>
     </ion-buttons>
-    <ion-title>Registro fotográfico</ion-title>
+    <ion-title>Registros Guardados</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true" class="ion-padding">
-  <form #formulario="ngForm" class="registro-form" (ngSubmit)="guardarRegistro()">
-    <h1>Fotografía del clima actual</h1>
-    <p class="intro">Captura una imagen y añade los detalles del momento.</p>
-    <input #selectorFotografia class="selector-fotografia" type="file" accept="image/*" capture="environment" (change)="seleccionarFotografia($event)" />
-    <ion-button type="button" expand="block" (click)="selectorFotografia.click()">Tomar fotografía</ion-button>
-    <div class="vista-previa" *ngIf="fotografia">
-      <img [src]="fotografia" alt="Fotografía del clima actual" />
-    </div>
-    <ion-item [class.ion-invalid]="condicionControl.invalid && condicionControl.touched">
-      <ion-label position="stacked">Condiciones climáticas</ion-label>
-      <ion-select #condicionControl="ngModel" name="condicion" [(ngModel)]="condicion" placeholder="Selecciona una condición" required>
-        <ion-select-option value="Soleado">Soleado</ion-select-option>
-        <ion-select-option value="Nublado">Nublado</ion-select-option>
-        <ion-select-option value="Lluvioso">Lluvioso</ion-select-option>
-      </ion-select>
-    </ion-item>
-    <ion-note color="danger" *ngIf="condicionControl.invalid && condicionControl.touched">Selecciona una condición climática.</ion-note>
-    <ion-item>
-      <ion-label position="stacked">Comentario</ion-label>
-      <ion-textarea name="comentario" [(ngModel)]="comentario" placeholder="Escribe un comentario sobre la fotografía" [autoGrow]="true"></ion-textarea>
-    </ion-item>
-    <ion-button expand="block" color="success" type="submit" [disabled]="formulario.invalid || !fotografia">Registrar fotografía</ion-button>
-  </form>
-  <ion-card *ngIf="registro" class="registro-guardado">
-    <ion-card-header><ion-card-title>Registro actual</ion-card-title></ion-card-header>
+  <!-- Opción global de Galería -->
+  <ion-item lines="none" style="margin-bottom: 15px;">
+    <ion-checkbox [(ngModel)]="guardarEnGaleria">Guardar fotos también en la galería del dispositivo</ion-checkbox>
+  </ion-item>
+
+  <!-- Mensaje si no existen registros -->
+  <div *ngIf="weatherService.registros().length === 0" style="text-align: center; margin-top: 50px;">
+    <h3>No hay registros guardados.</h3>
+    <p>Realiza primero una consulta desde la página principal utilizando el botón "Consultar clima".</p>
+  </div>
+
+  <!-- Lista de Registros -->
+  <ion-card *ngFor="let reg of weatherService.registros()" style="margin-bottom: 20px;">
+    <ion-card-header>
+      <ion-card-title style="font-size: 1.1rem; color: #3880ff;">
+        {{ reg.fecha_hora }} - {{ reg.condicion }}
+      </ion-card-title>
+    </ion-card-header>
+
     <ion-card-content>
-      <img [src]="registro.fotografia" alt="Fotografía registrada" />
-      <p><strong>Condición:</strong> {{ registro.condicion }}</p>
-      <p *ngIf="registro.comentario"><strong>Comentario:</strong> {{ registro.comentario }}</p>
-      <p class="fecha">{{ registro.fecha }}</p>
+      <ion-list lines="none">
+        <ion-item><ion-label><b>Coordenadas GPS:</b> {{ reg.latitud }}, {{ reg.longitud }}</ion-label></ion-item>
+        <ion-item><ion-label><b>Temperatura:</b> {{ reg.temperatura }} °C</ion-label></ion-item>
+        <ion-item><ion-label><b>Sensación térmica:</b> {{ reg.sensacion_termica }} °C</ion-label></ion-item>
+        <ion-item><ion-label><b>Humedad:</b> {{ reg.humedad }} %</ion-label></ion-item>
+        <ion-item><ion-label><b>Viento:</b> {{ reg.viento }} km/h</ion-label></ion-item>
+      </ion-list>
+
+      <!-- Thumbnail / Vista Previa de la Fotografía -->
+      <div *ngIf="reg.fotografia" style="margin: 15px 0; text-align: center;">
+        <p><b>Fotografía adjunta:</b></p>
+        <img [src]="reg.fotografia" alt="Vista previa" style="max-width: 100%; height: 180px; object-fit: cover; border-radius: 8px;" />
+      </div>
+
+      <!-- Botón para Tomar/Reemplazar Foto -->
+      <ion-button expand="block" color="tertiary" (click)="tomarFotografia(reg)" style="margin-top: 10px;">
+        {{ reg.fotografia ? 'Reemplazar fotografía' : 'Tomar fotografía' }}
+      </ion-button>
     </ion-card-content>
   </ion-card>
 </ion-content>

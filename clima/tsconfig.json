@@ -22,6 +22,9 @@
     "skipLibCheck": true,
     "useDefineForClassFields": false
   },
+  "exclude": [
+    "capacitor.config.ts"
+  ],
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
     "strictInjectionParameters": true,

@@ -1,56 +1,105 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
-  IonBackButton, IonButton, IonButtons, IonCard, IonCardContent, IonCardHeader,
-  IonCardTitle, IonContent, IonHeader, IonItem, IonLabel, IonNote, IonSelect,
-  IonSelectOption, IonTextarea, IonTitle, IonToolbar,
+  IonBackButton,
+  IonButton,
+  IonButtons,
+  IonCard,
+  IonCardContent,
+  IonCardHeader,
+  IonCardTitle,
+  IonContent,
+  IonHeader,
+  IonItem,
+  IonLabel,
+  IonList,
+  IonTitle,
+  IonToolbar,
+  IonCheckbox,
+  ToastController,
 } from '@ionic/angular';
-import { CondicionClimatica, RegistroFotografia } from '../domain/photo-record.models';
+import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
+
+import { WeatherService } from '../../weather/infrastructure/weather.service';
+import { RegistroClimatico } from '../../weather/domain/clima.models';
 
 @Component({
   selector: 'app-registro',
   standalone: true,
   imports: [
-    CommonModule, FormsModule, IonBackButton, IonButton, IonButtons, IonCard,
-    IonCardContent, IonCardHeader, IonCardTitle, IonContent, IonHeader, IonItem,
-    IonLabel, IonNote, IonSelect, IonSelectOption, IonTextarea, IonTitle, IonToolbar,
+    CommonModule,
+    FormsModule,
+    IonBackButton,
+    IonButton,
+    IonButtons,
+    IonCard,
+    IonCardContent,
+    IonCardHeader,
+    IonCardTitle,
+    IonContent,
+    IonHeader,
+    IonItem,
+    IonLabel,
+    IonList,
+    IonTitle,
+    IonToolbar,
+    IonCheckbox,
   ],
   templateUrl: './registro.page.html',
   styleUrls: ['./registro.page.scss'],
 })
-export class RegistroPage implements OnDestroy {
-  condicion: CondicionClimatica | '' = '';
-  comentario = '';
-  fotografia: string | null = null;
-  registro: RegistroFotografia | null = null;
+export class RegistroPage {
+  guardarEnGaleria = false;
 
-  seleccionarFotografia(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    const archivo = input.files?.[0];
-    if (!archivo || !archivo.type.startsWith('image/')) return;
-    this.liberarFotografia();
-    this.fotografia = URL.createObjectURL(archivo);
-    this.registro = null;
-    input.value = '';
-  }
+  constructor(
+    public weatherService: WeatherService,
+    private toastCtrl: ToastController
+  ) {}
 
-  guardarRegistro(): void {
-    if (!this.fotografia || !this.condicion) return;
-    this.registro = {
-      fotografia: this.fotografia,
-      condicion: this.condicion,
-      comentario: this.comentario.trim(),
-      fecha: new Date().toLocaleString(),
-    };
-  }
+  async tomarFotografia(registro: RegistroClimatico): Promise<void> {
+    try {
+      const permission = await Camera.requestPermissions();
+      if (permission.camera !== 'granted' && permission.photos !== 'granted') {
+        const toast = await this.toastCtrl.create({
+          message: 'Se requieren permisos de cámara para tomar una fotografía.',
+          duration: 2500,
+          color: 'warning',
+        });
+        await toast.present();
+        return;
+      }
 
-  ngOnDestroy(): void { this.liberarFotografia(); }
+      const imagen = await Camera.getPhoto({
+        quality: 90,
+        allowEditing: false,
+        resultType: CameraResultType.DataUrl,
+        source: CameraSource.Camera,
+        saveToGallery: this.guardarEnGaleria,
+      });
 
-  private liberarFotografia(): void {
-    if (this.fotografia) {
-      URL.revokeObjectURL(this.fotografia);
-      this.fotografia = null;
+      if (imagen.dataUrl) {
+        this.weatherService.actualizarFotografia(registro.id, imagen.dataUrl);
+
+        const mensaje = this.guardarEnGaleria
+          ? 'Fotografía capturada y guardada en la Galería.'
+          : 'Fotografía adjuntada al registro exitosamente.';
+
+        const toast = await this.toastCtrl.create({
+          message: mensaje,
+          duration: 2500,
+          color: 'success',
+        });
+        await toast.present();
+      }
+    } catch (error) {
+      console.log('Captura cancelada o no disponible:', error);
+      const toast = await this.toastCtrl.create({
+        message: 'No se pudo acceder a la cámara.',
+        duration: 2500,
+        color: 'danger',
+      });
+      await toast.present();
     }
   }
 }

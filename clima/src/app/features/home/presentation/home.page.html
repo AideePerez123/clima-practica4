@@ -1,17 +1,66 @@
 <ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>Inicio</ion-title>
+  <ion-toolbar color="primary">
+    <ion-title>UMES Clima v3</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true" class="ion-padding">
-  <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%;">
-    <h1 style="font-size: 2rem; font-weight: bold; margin-bottom: 30px;">UMES -MOVIL 2</h1>
-    <ion-button expand="block" color="primary" (click)="irAClima()">
+  <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center;">
+    <h1>Consulta Meteorológica GPS</h1>
+    <p>Obtén el clima en tiempo real según tu ubicación nativa y guarda tus observaciones.</p>
+
+    <!-- Indicador de Carga -->
+    <div *ngIf="cargando" style="margin: 20px 0;">
+      <ion-spinner name="crescent" color="primary"></ion-spinner>
+      <p>Obteniendo ubicación GPS y consultando clima...</p>
+    </div>
+
+    <!-- Botón Consultar Clima -->
+    <ion-button expand="block" color="primary" (click)="obtenerClimaGPS()" [disabled]="cargando" style="width: 100%; max-width: 300px; margin-top: 15px;">
       Consultar clima
     </ion-button>
-    <ion-button expand="block" color="secondary" (click)="irARegistro()">
-      Registrar fotografía del clima
+
+    <!-- Contador de Registros -->
+    <div style="margin: 25px 0; font-size: 1.1rem; font-weight: bold;">
+      Total de registros guardados: {{ weatherService.registros().length }}
+    </div>
+
+    <!-- Botón Registros Guardados -->
+    <ion-button expand="block" color="secondary" (click)="irARegistros()" style="width: 100%; max-width: 300px;">
+      Registros guardados
     </ion-button>
   </div>
+
+  <!-- Diálogo / Modal del Resultado de la Consulta -->
+  <ion-modal [isOpen]="mostrarModal">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar color="light">
+          <ion-title>Resultado del Clima</ion-title>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="ion-padding" *ngIf="climaActual">
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>{{ climaActual.condicion }}</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <ion-list lines="none">
+              <ion-item><ion-label><b>Latitud:</b> {{ climaActual.latitud }}</ion-label></ion-item>
+              <ion-item><ion-label><b>Longitud:</b> {{ climaActual.longitud }}</ion-label></ion-item>
+              <ion-item><ion-label><b>Temperatura:</b> {{ climaActual.temperatura }} °C</ion-label></ion-item>
+              <ion-item><ion-label><b>Sensación térmica:</b> {{ climaActual.sensacion_termica }} °C</ion-label></ion-item>
+              <ion-item><ion-label><b>Humedad:</b> {{ climaActual.humedad }} %</ion-label></ion-item>
+              <ion-item><ion-label><b>Viento:</b> {{ climaActual.viento }} km/h</ion-label></ion-item>
+            </ion-list>
+          </ion-card-content>
+        </ion-card>
+
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
+          <ion-button expand="block" color="medium" (click)="cerrarModal()" style="flex: 1;">Cerrar</ion-button>
+          <ion-button expand="block" color="success" (click)="guardarYMostrarToast()" style="flex: 1;">Registrar</ion-button>
+        </div>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
 </ion-content>
